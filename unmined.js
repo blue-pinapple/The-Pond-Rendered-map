@@ -8,7 +8,7 @@ class RegionMap {
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
     }
-
+    
     hasTile(tileX, tileZ, unminedZoomLevel) {
         const zoomFactor = Math.pow(2, unminedZoomLevel);
 
@@ -49,6 +49,8 @@ class RegionMap {
                     var bit = inx % 32;
                     var found = (b & (1 << bit)) != 0;
                     if (found) return true;
+                    return true;
+
                 }
             }
         }
@@ -162,7 +164,6 @@ class RedDotMarker {
     }
 
 }
-
 class Unmined {
 
     olMap = null;
@@ -173,7 +174,7 @@ class Unmined {
     dataProjection = null;
     regionMap = null;
     markersLayer = null;
-    playerMarkersLayer = null;
+    playerMarkersLayer = null;    
 
     #scaleLine = null;
     #options = null;
@@ -226,7 +227,7 @@ class Unmined {
         const resolutions = new Array(mapZoomLevels + 1);
         for (let z = 0; z <= mapZoomLevels; ++z) {
 
-            let b = 1 * Math.pow(2, mapZoomLevels - z - this.#options.maxZoom);
+            let b = 1 * Math.pow(2, mapZoomLevels - z - this.#options.maxZoom); 
             b = ol.proj.transform([b, b], this.dataProjection, this.viewProjection)[0];
             resolutions[z] = b * dpiScale;
         }
@@ -325,7 +326,6 @@ class Unmined {
         this.updateMarkersLayer();
         this.updatePlayerMarkersLayer();
         this.olMap.addControl(this.createContextMenu());
-
         this.redDotMarker = new RedDotMarker(this.olMap, this.dataProjection, this.viewProjection);
 
         this.centerOnRedDotMarker();
@@ -355,12 +355,19 @@ class Unmined {
             var item = markers[i];
             var longitude = item.x;
             var latitude = item.z;
+                        
+            //added feature2 & style2
 
             var feature = new ol.Feature({
                 geometry: new ol.geom.Point(ol.proj.transform([longitude, latitude], this.dataProjection, this.viewProjection))
             });
+            var feature2 = new ol.Feature({
+                geometry: new ol.geom.Point(ol.proj.transform([longitude, latitude], this.dataProjection, this.viewProjection))
+            });
 
             var style = new ol.style.Style();
+            var style2 = new ol.style.Style();
+
             if (item.image)
                 style.setImage(new ol.style.Icon({
                     src: item.image,
@@ -370,6 +377,17 @@ class Unmined {
 
             if (item.text) {
                 style.setText(new ol.style.Text({
+                    text: item.text,
+                    font: item.font,
+                    offsetX: (item.offsetX + 2),
+                    offsetY: (item.offsetY + 2),
+                    fill: item.textColor ? new ol.style.Fill({
+                        color: "black"
+                    }) : null,
+                    padding: item.textPadding ?? [2, 4, 2, 4]
+                }));
+
+                style2.setText(new ol.style.Text({
                     text: item.text,
                     font: item.font,
                     offsetX: item.offsetX,
@@ -390,11 +408,15 @@ class Unmined {
                         width: item.textBackgroundStrokeWidth
                     }) : null,
                 }));
+
             }
 
+            feature2.setStyle(style2);
             feature.setStyle(style);
 
             features.push(feature);
+            features.push(feature2);
+
         }
 
         var vectorSource = new ol.source.Vector({
@@ -442,7 +464,7 @@ class Unmined {
 
         if (this.gridLayer) this.olMap.removeLayer(this.gridLayer);
         if (this.coordinateLayer) this.olMap.removeLayer(this.coordinateLayer);
-
+        
         this.gridLayer = null;
         if (!this.#options.enableGrid) return;
 
@@ -573,6 +595,13 @@ class Unmined {
             items: [],
         });
         contextmenu.on('open', (evt) => {
+            /*
+            const pixel = [
+                evt.pageX - evt.currentTarget.offsetLeft,
+                evt.pageY - evt.currentTarget.offsetTop]
+            const coordinate = ol.proj.transform(this.olMap.getCoordinateFromPixel(pixel), this.viewProjection, this.dataProjection);
+            */
+
             const coordinates = ol.proj.transform(this.olMap.getEventCoordinate(evt.originalEvent), this.viewProjection, this.dataProjection);
 
             coordinates[0] = Math.round(coordinates[0]);
@@ -580,7 +609,7 @@ class Unmined {
 
             contextmenu.clear();
             contextmenu.push({
-                text: `Copy /tp ${coordinates[0]} ~ ${coordinates[1]}`,
+                text: `/tp ${coordinates[0]} ~ ${coordinates[1]}`,
                 callback: () => {
                     Unmined.copyToClipboard(`/tp ${coordinates[0]} ~ ${coordinates[1]}`);
                 }
@@ -609,14 +638,13 @@ class Unmined {
                 });
             }
             contextmenu.push('-');
-
             if (this.playerMarkersLayer) {
                 contextmenu.push(
                     {
                         classname: this.#options.showPlayers ? 'menuitem-checked' : 'menuitem-unchecked',
                         text: 'Show players',
                         callback: () => this.togglePlayers()
-                    })
+                    })                
             }
 
             if (this.markersLayer) {
@@ -625,14 +653,14 @@ class Unmined {
                         classname: this.#options.showMarkers ? 'menuitem-checked' : 'menuitem-unchecked',
                         text: 'Show markers',
                         callback: () => this.toggleMarkers()
-                    })
+                    })                
             }
 
 
             if (this.markersLayer || this.playerMarkersLayer) {
                 contextmenu.push('-');
             }
-
+            
             if (this.#options.enableGrid) {
                 contextmenu.push(
                     {
@@ -653,7 +681,7 @@ class Unmined {
                         callback: () => this.toggleBinaryGrid()
                     })
             }
-
+            
             contextmenu.push(
                 {
                     classname: this.#options.showScaleBar ? 'menuitem-checked' : 'menuitem-unchecked',
