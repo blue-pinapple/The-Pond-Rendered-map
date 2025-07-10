@@ -44,8 +44,9 @@
 <body>
     <div class="banner">
         <a href="#" onclick="updateIframe(this, './SMP_Overworld/index copy.html')" class="active">Overworld</a>
+        <a href="#" onclick="updateIframe(this, './SMP_Nether/index copy.html')">Nether</a>
         <a href="#" onclick="updateIframe(this, './plots251/index copy.html')">Plots 251</a>
-        <a href="#" onclick="updateIframe(this, './Portals/index.html')">Portals</a>
+        <a href="#" onclick="updateIframe(this, './plots75/index copy.html')">Plots 75</a>
         <p id="N_Cords">Nether Cords: NaN</p>
 
     </div>
@@ -74,24 +75,44 @@
 Nether()
 function Nether() {
     const iframe = document.getElementById("contentFrame").contentWindow
+    const thing = document.getElementById("contentFrame")
     iframe.addEventListener("mousemove", (e) => {
         let elements = document.getElementById("contentFrame").contentWindow.document.querySelector(".ol-mouse-position")
         let pos = elements.textContent;
             pos = pos.split(", ");
-            let x = Math.round(parseInt(pos[0]) / 8);
-            let y = Math.round(parseInt(pos[1]) / 8);
+            if (thing.src.includes("SMP_Overworld")) {
+                let x = Math.round(parseInt(pos[0]) / 8);
+                let y = Math.round(parseInt(pos[1]) / 8);
+                document.getElementById("N_Cords").innerHTML = "Nether Cords: " + x + ", " + y;
+
+            } else if (thing.src.includes("SMP_Nether")) {
+                let x = Math.round(parseInt(pos[0]) * 8);
+                let y = Math.round(parseInt(pos[1]) * 8);
+                document.getElementById("N_Cords").innerHTML = "Overworld Cords: " + x + ", " + y;
+
+            } else {
+                document.getElementById("N_Cords").innerHTML = "Nether Cords: N/A";
+            }
             //console.log(x, y);
-            document.getElementById("N_Cords").innerHTML = "Nether Cords: " + x + ", " + y;
 
     });
     iframe.addEventListener("touchmove", (e) => {
         let elements = document.getElementById("contentFrame").contentWindow.document.querySelector(".ol-mouse-position")
         let pos = elements.textContent;
             pos = pos.split(", ");
-            let x = Math.round(parseInt(pos[0]) / 8);
-            let y = Math.round(parseInt(pos[1]) / 8);
-            //console.log(x, y);
-            document.getElementById("N_Cords").innerHTML = "Nether Cords: " + x + ", " + y;
+            if (thing.src.includes("SMP_Overworld")) {
+                let x = Math.round(parseInt(pos[0]) / 8);
+                let y = Math.round(parseInt(pos[1]) / 8);
+                document.getElementById("N_Cords").innerHTML = "Nether Cords: " + x + ", " + y;
+
+            } else if (thing.src.includes("SMP_Nether")) {
+                let x = Math.round(parseInt(pos[0]) * 8);
+                let y = Math.round(parseInt(pos[1]) * 8);
+                document.getElementById("N_Cords").innerHTML = "Overworld Cords: " + x + ", " + y;
+
+            } else {
+                document.getElementById("N_Cords").innerHTML = "Nether Cords: N/A";
+            }
 
     });
 }</script>
