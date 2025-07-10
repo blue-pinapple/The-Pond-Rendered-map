@@ -35,39 +35,64 @@ You can use https://mapmarker.io/editor to generate custom pin images.
 Use the imageScale property if the pin image is too large.
 
 */
-
+console.log('UnminedCustomMarkers.js loaded');
 UnminedCustomMarkers = {
 
     isEnabled: true,
 
     markers: [
 
-        // Example 1: Simple marker
-        {
-            x: -195,
-            z: 90,
-            image: "compass.gif",
-            imageAnchor: [0.5, 0.5],
-            imageScale: 0.2,
-        },
 
         // Example 2: Marker with text
         {
-            x: -85,
-            z: 632,
-            image: "Shop_Icon.png",
+            x: 0,
+            z: 0,
+            image: "../house.pin.png",
             imageAnchor: [0.5, 1],
-            imageScale: 0.2,
-            text: "Shopping District",
-            textColor: "black", 
+            imageScale: 0.15,
+            text: "Spawn",
+            textColor: "white", 
             offsetX: 0,
-            offsetY: 10,
-            font: "bold 15px Verdana,sans serif",
+            offsetY: 20,
+            font: "20px Minecraftia, sans-serif",
         },
 
         // Example 3: Text only
-        // add your markers here
+        {
+            x: -24,
+            z: 337,
+            text: "Main Comunity", 
+            textColor: "white", 
+            offsetX: 0,
+            offsetY: 0, 
+            font: "15px Minecraftia, sans serif",
+        },
 
+        // add your markers here
+        {
+            x: -286.959869142667,
+            z: 563.328642525922,
+            image: "../items/minecraft_gunpowder.png",
+            imageAnchor: [.5, .5],
+            imageScale: .5,
+            text: "Creaper Farm",
+            textColor: "white", 
+            offsetX: 0,
+            offsetY: 20,
+            font: "12px Minecraftia, sans-serif",
+        },
+        {
+            x: -64.74459281854790,
+            z: 1775.300000011920,
+            image: "../items/minecraft_mossy_stone_bricks.png",
+            imageAnchor: [.5, .5],
+            imageScale: .5,
+            text: "Stronghold Entrance",
+            textColor: "white", 
+            offsetX: 0,
+            offsetY: 20,
+            font: "12px Minecraftia, sans-serif",
+        },
 
 
 
