@@ -604,14 +604,18 @@ class Unmined {
 
             const coordinates = ol.proj.transform(this.olMap.getEventCoordinate(evt.originalEvent), this.viewProjection, this.dataProjection);
 
-            coordinates[0] = Math.round((coordinates[0] -40 )/ 80+1);
-            coordinates[1] = Math.round((coordinates[1] -40 )/ 80+1);
+            coordinates[0] = Math.round(coordinates[0]);
+            coordinates[1] = Math.round(coordinates[1]);
+
+            let altCoordinates = [0,0];
+            altCoordinates[0] = Math.round((coordinates[0] -40 )/ 80+1);
+            altCoordinates[1] = Math.round((coordinates[1] -40 )/ 80+1);
 
             contextmenu.clear();
             contextmenu.push({
-                text: `/plots tp ${coordinates[0]};${coordinates[1]}`,
+                text: `/plots tp ${altCoordinates[0]};${altCoordinates[1]}`,
                 callback: () => {
-                    Unmined.copyToClipboard(`/plots tp ${coordinates[0]};${coordinates[1]}`);
+                    Unmined.copyToClipboard(`/plots tp ${altCoordinates[0]};${altCoordinates[1]}`);
                 }
             })
             contextmenu.push('-');

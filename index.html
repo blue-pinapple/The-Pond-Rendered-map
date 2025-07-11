@@ -43,14 +43,14 @@
 </head>
 <body>
     <div class="banner">
-        <a href="#" onclick="updateIframe(this, './SMP_Overworld/index copy.html')" class="active">Overworld</a>
-        <a href="#" onclick="updateIframe(this, './SMP_Nether/index copy.html')">Nether</a>
-        <a href="#" onclick="updateIframe(this, './plots251/index copy.html')">Plots 251</a>
-        <a href="#" onclick="updateIframe(this, './plots75/index copy.html')">Plots 75</a>
+        <a href="#" onclick="updateIframe(this, './paper_1_21_1_2972731/index_copy.html')" class="active">Overworld</a>
+        <a href="#" onclick="updateIframe(this, './paper_1_21_1_2972731_nether/index_copy.html')">Nether</a>
+        <a href="#" onclick="updateIframe(this, './plots251/index_copy.html')">Plots 251</a>
+        <a href="#" onclick="updateIframe(this, './plots75/index_copy.html')">Plots 75</a>
         <p id="N_Cords">Nether Cords: NaN</p>
 
     </div>
-    <iframe class="iframe-container" id="contentFrame" src="./SMP_Overworld/index copy.html"></iframe>
+    <iframe class="iframe-container" id="contentFrame" src="./paper_1_21_1_2972731/index_copy.html"></iframe>
 
     <script>
         function updateIframe(link, src) {
@@ -72,6 +72,30 @@
    
 
 <script type="text/javascript">    
+function altCords(X, Y, src) {
+            if (src.includes("nether")) {
+                let x = Math.round(X * 8);
+                let y = Math.round(Y * 8);
+                document.getElementById("N_Cords").innerHTML = "Overworld Cords: " + x + ", " + y;
+
+            } else if (src.includes("paper_1_21_1_2972731")) {
+                let x = Math.round(X / 8);
+                let y = Math.round(Y / 8);
+                document.getElementById("N_Cords").innerHTML = "Nether Cords: " + x + ", " + y;
+
+            } else if (src.includes("plots251")) {
+                let x = Math.round((X -136 )/ 272+1);
+                let y = Math.round((Y -136 )/ 272+1);
+                document.getElementById("N_Cords").innerHTML = "Plot Cords: " + x + ", " + y;
+            } else if (src.includes("plots75")) {
+                let x = Math.round((X -40 )/ 80+1);
+                let y = Math.round((Y -40 )/ 80+1);
+                document.getElementById("N_Cords").innerHTML = "Plot Cords: " + x + ", " + y;
+            } else {
+                document.getElementById("N_Cords").innerHTML = "Nether Cords: N/A";
+            }
+}
+
 Nether()
 function Nether() {
     const iframe = document.getElementById("contentFrame").contentWindow
@@ -80,19 +104,7 @@ function Nether() {
         let elements = document.getElementById("contentFrame").contentWindow.document.querySelector(".ol-mouse-position")
         let pos = elements.textContent;
             pos = pos.split(", ");
-            if (thing.src.includes("SMP_Overworld")) {
-                let x = Math.round(parseInt(pos[0]) / 8);
-                let y = Math.round(parseInt(pos[1]) / 8);
-                document.getElementById("N_Cords").innerHTML = "Nether Cords: " + x + ", " + y;
-
-            } else if (thing.src.includes("SMP_Nether")) {
-                let x = Math.round(parseInt(pos[0]) * 8);
-                let y = Math.round(parseInt(pos[1]) * 8);
-                document.getElementById("N_Cords").innerHTML = "Overworld Cords: " + x + ", " + y;
-
-            } else {
-                document.getElementById("N_Cords").innerHTML = "Nether Cords: N/A";
-            }
+            altCords(parseInt(pos[0]),parseInt(pos[1]),thing.src)
             //console.log(x, y);
 
     });
@@ -100,22 +112,13 @@ function Nether() {
         let elements = document.getElementById("contentFrame").contentWindow.document.querySelector(".ol-mouse-position")
         let pos = elements.textContent;
             pos = pos.split(", ");
-            if (thing.src.includes("SMP_Overworld")) {
-                let x = Math.round(parseInt(pos[0]) / 8);
-                let y = Math.round(parseInt(pos[1]) / 8);
-                document.getElementById("N_Cords").innerHTML = "Nether Cords: " + x + ", " + y;
+            altCords(parseInt(pos[0]), parseInt(pos[1]), thing.src)
 
-            } else if (thing.src.includes("SMP_Nether")) {
-                let x = Math.round(parseInt(pos[0]) * 8);
-                let y = Math.round(parseInt(pos[1]) * 8);
-                document.getElementById("N_Cords").innerHTML = "Overworld Cords: " + x + ", " + y;
-
-            } else {
-                document.getElementById("N_Cords").innerHTML = "Nether Cords: N/A";
-            }
 
     });
-}</script>
+}
+
+</script>
     <style>
         body {
             font-family: Arial, sans-serif;
