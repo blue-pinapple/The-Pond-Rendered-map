@@ -42,7 +42,10 @@
     <div id="map"></div>
 
     <script type="text/javascript">
-
+        if (window.location.href.includes("%C2%A7")) {
+            window.location.href = window.location.href.replace("%C2%A7", "&");
+        }
+        
         document.title = UnminedMapProperties.worldName + " - " + document.title;
 
         if (UnminedCustomMarkers && UnminedCustomMarkers.isEnabled && UnminedCustomMarkers.markers) {
