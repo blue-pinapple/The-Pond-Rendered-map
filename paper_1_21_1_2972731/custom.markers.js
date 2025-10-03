@@ -57,12 +57,12 @@ UnminedCustomMarkers = {
             z: 632,
             image: "../items/minecraft_beacon.png",
             imageAnchor: [0.5, 1],
-            imageScale: 0.7,
+            imageScale: 0.6,
             text: "Shopping Hole",
             textColor: "white", 
             offsetX: 0,
             offsetY: 10,
-            font: "15px Minecraftia, sans-serif",
+            font: "12px Minecraftia, sans-serif",
         },
 
         {
@@ -70,12 +70,12 @@ UnminedCustomMarkers = {
             z: 400,
             image: "../items/minecraft_honey_bottle.png",
             imageAnchor: [0.5, 1],
-            imageScale: 0.7,
-            text: "Shopping Hole",
+            imageScale: 0.6,
+            text: "Donut Market",
             textColor: "white", 
             offsetX: 0,
             offsetY: 10,
-            font: "15px Minecraftia, sans-serif",
+            font: "12px Minecraftia, sans-serif",
         },
 
                 {
@@ -83,12 +83,12 @@ UnminedCustomMarkers = {
             z: 730,
             image: "../items/minecraft_tnt.png",
             imageAnchor: [0.5, 1],
-            imageScale: 0.7,
-            text: "Shopping Hole",
+            imageScale: 0.6,
+            text: "Gamming District",
             textColor: "white", 
             offsetX: 0,
             offsetY: 10,
-            font: "15px Minecraftia, sans-serif",
+            font: "12px Minecraftia, sans-serif",
         },
 
         {
