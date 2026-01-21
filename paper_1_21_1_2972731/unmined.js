@@ -186,6 +186,7 @@ class Unmined {
         denseGrid: false,
         showMarkers: true,
         showPlayers: true,
+        showCoreMarkers:true,
         centerX: 0,
         centerZ: 0
     }
@@ -660,6 +661,12 @@ class Unmined {
                     text: 'Show scalebar',
                     callback: () => this.toggleScaleBar()
                 })
+            contextmenu.push(
+                {
+                    classname: this.#options.showScaleBar ? 'menuitem-checked' : 'menuitem-unchecked',
+                    text: 'Show scalebar',
+                    callback: () => this.toggleScaleBar()
+                })
 
 
         })
@@ -731,6 +738,7 @@ class Unmined {
             denseGrid: this.#options.denseGrid,
             showMarkers: this.#options.showMarkers,
             showPlayers: this.#options.showPlayers,
+            showCoreMarkers:this.#options.showCoreMarkers,
         }
         localStorage.setItem("mapSettings", JSON.stringify(mapSettings))
     }

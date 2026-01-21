@@ -21,6 +21,8 @@
             color: white;
             padding: 15px;
             text-align: center;
+  transition: 0.3s;
+
         }
         .banner a {
             color: white;
@@ -42,6 +44,11 @@
     </style>
 </head>
 <body>
+    <div style="position: absolute; z-index: 10;" class="alert">
+  <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+  <strong>Tip!</strong> You can right click/hold map for settings
+</div>
+
     <div class="banner">
         <a href="#" onclick="updateIframe(this, './paper_1_21_1_2972731/index_copy.html')" class="active">Overworld</a>
         <a href="#" onclick="updateIframe(this, './paper_1_21_1_2972731_nether/index_copy.html')">Nether</a>
@@ -169,5 +176,35 @@ function Nether() {
         }
     }
     </style>
+    <style>
+.alert {
+  padding: 20px;
+  background-color: #2196F3;
+  color: white;
+  opacity: 0;
+  transform: translateY(-100%);
+animation: fadeIn 1s;
+animation-delay: 30s;
+animation-fill-mode: forwards;
+
+}
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;}
+
+.closebtn:hover {
+  color: black;
+}
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(-100%);}
+  to {opacity: 1; transform: translateY(0); }
+}
+</style>
 </body>
 </html>
