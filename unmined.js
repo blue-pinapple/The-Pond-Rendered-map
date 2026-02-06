@@ -174,9 +174,11 @@ class Unmined {
     dataProjection = null;
     regionMap = null;
     markersLayer = null;
-    playerMarkersLayer = null;    
+    playerMarkersLayer = null;
+    mapKeyLayer = null;    
 
     #scaleLine = null;
+    #mapKeyControl = null;
     #options = null;
 
     static defaultOptions = {
@@ -187,15 +189,23 @@ class Unmined {
         denseGrid: false,
         showMarkers: true,
         showPlayers: true,
+        showMapKey: true,
+        mapKeyImage: null,
         centerX: 0,
         centerZ: 0
     }
 
-    constructor(mapElement, options, regions) {
+    constructor(mapElement, options, regions, extraOptions) {
 
         const worldTileSize = 256;
 
-        this.#options = { ...Unmined.defaultOptions, ...options };
+        // Support both calling conventions:
+        // 1) new Unmined(mapElement, options, regions)
+        // 2) new Unmined(mapElement, options, regions, extraOptions)
+        // The legacy usage in some index files passes a separate fourth argument
+        // with additional options (e.g. { mapKeyImage: 'map-key.png' }). Merge
+        // that into the primary options so mapKeyImage is recognized.
+        this.#options = { ...Unmined.defaultOptions, ...options, ...(extraOptions || {}) };
 
         this.loadSettings();
 
@@ -323,6 +333,7 @@ class Unmined {
 
         this.updateGraticule();
         this.updateScaleBar();
+        this.updateMapKey();
         this.updateMarkersLayer();
         this.updatePlayerMarkersLayer();
         this.olMap.addControl(this.createContextMenu());
@@ -355,18 +366,13 @@ class Unmined {
             var item = markers[i];
             var longitude = item.x;
             var latitude = item.z;
-                        
-            //added feature2 & style2
 
             var feature = new ol.Feature({
-                geometry: new ol.geom.Point(ol.proj.transform([longitude, latitude], this.dataProjection, this.viewProjection))
-            });
-            var feature2 = new ol.Feature({
-                geometry: new ol.geom.Point(ol.proj.transform([longitude, latitude], this.dataProjection, this.viewProjection))
+                geometry: new ol.geom.Point(ol.proj.transform([longitude, latitude], this.dataProjection, this.viewProjection)),
+                markerData: item
             });
 
             var style = new ol.style.Style();
-            var style2 = new ol.style.Style();
 
             if (item.image)
                 style.setImage(new ol.style.Icon({
@@ -376,46 +382,42 @@ class Unmined {
                 }));
 
             if (item.text) {
-                style.setText(new ol.style.Text({
-                    text: item.text,
-                    font: item.font,
-                    offsetX: (item.offsetX + 2),
-                    offsetY: (item.offsetY + 2),
-                    fill: item.textColor ? new ol.style.Fill({
-                        color: "black"
-                    }) : null,
-                    padding: item.textPadding ?? [2, 4, 2, 4]
-                }));
+                // shadow color = 25% brightness of text color (fallback black)
+                let shadowColor = item.textColor ? Unmined.#darkenColor(item.textColor, 0.25) : '#000000';
 
-                style2.setText(new ol.style.Text({
+                const mainText = new ol.style.Text({
                     text: item.text,
                     font: item.font,
                     offsetX: item.offsetX,
                     offsetY: item.offsetY,
-                    fill: item.textColor ? new ol.style.Fill({
-                        color: item.textColor
-                    }) : null,
+                    fill: item.textColor ? new ol.style.Fill({ color: item.textColor }) : null,
                     padding: item.textPadding ?? [2, 4, 2, 4],
-                    stroke: item.textStrokeColor ? new ol.style.Stroke({
-                        color: item.textStrokeColor,
-                        width: item.textStrokeWidth
-                    }) : null,
-                    backgroundFill: item.textBackgroundColor ? new ol.style.Fill({
-                        color: item.textBackgroundColor
-                    }) : null,
-                    backgroundStroke: item.textBackgroundStrokeColor ? new ol.style.Stroke({
-                        color: item.textBackgroundStrokeColor,
-                        width: item.textBackgroundStrokeWidth
-                    }) : null,
-                }));
+                    stroke: item.textStrokeColor ? new ol.style.Stroke({ color: item.textStrokeColor, width: item.textStrokeWidth }) : null,
+                    backgroundFill: item.textBackgroundColor ? new ol.style.Fill({ color: item.textBackgroundColor }) : null,
+                    backgroundStroke: item.textBackgroundStrokeColor ? new ol.style.Stroke({ color: item.textBackgroundStrokeColor, width: item.textBackgroundStrokeWidth }) : null,
+                });
 
+                const shadowText = new ol.style.Text({
+                    text: item.text,
+                    font: item.font,
+                    // offset shadow by 10px down and right
+                    offsetX: (item.offsetX ?? 0) + 1.7,
+                    offsetY: (item.offsetY ?? 0) + 1.7,
+                    fill: new ol.style.Fill({ color: shadowColor }),
+                    padding: item.textPadding ?? [2, 4, 2, 4]
+                });
+
+                // apply main text to the existing style (so images stay on the main style)
+                style.setText(mainText);
+
+                // create separate style for shadow and assign both (shadow first)
+                const shadowStyle = new ol.style.Style({ text: shadowText });
+                feature.setStyle([shadowStyle, style]);
+            } else {
+                feature.setStyle(style);
             }
 
-            feature2.setStyle(style2);
-            feature.setStyle(style);
-
             features.push(feature);
-            features.push(feature2);
 
         }
 
@@ -423,8 +425,45 @@ class Unmined {
             features: features
         });
 
+        // Wrap the source with clustering
+        var clusterSource = new ol.source.Cluster({
+            source: vectorSource,
+            distance: 35 // pixels
+        });
+
         var vectorLayer = new ol.layer.Vector({
-            source: vectorSource
+            source: clusterSource,
+            style: (feature) => {
+                const cluster = feature.get('features');
+                const size = cluster.length;
+
+                if (size === 1) {
+                    // Single marker, use its original style
+                    return cluster[0].getStyle();
+                } else {
+                    // Multiple markers clustered, show count
+                    const clusterStyle = new ol.style.Style({
+                        image: new ol.style.Circle({
+                            radius: 15,
+                            fill: new ol.style.Fill({
+                                color: 'rgba(66, 139, 202, 0.8)'
+                            }),
+                            stroke: new ol.style.Stroke({
+                                color: '#fff',
+                                width: 2
+                            })
+                        }),
+                        text: new ol.style.Text({
+                            text: size.toString(),
+                            font: 'bold 16px Arial',
+                            fill: new ol.style.Fill({
+                                color: '#fff'
+                            })
+                        })
+                    });
+                    return clusterStyle;
+                }
+            }
         });
         return vectorLayer;
     }
@@ -578,6 +617,45 @@ class Unmined {
         Unmined.toast(toast ?? "Copied!");
     }
 
+    static #darkenColor(color, brightness) {
+        // Handle hex colors
+        if (color.startsWith('#')) {
+            const hex = color.slice(1);
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            
+            const darkR = Math.round(r * brightness);
+            const darkG = Math.round(g * brightness);
+            const darkB = Math.round(b * brightness);
+            
+            return `#${darkR.toString(16).padStart(2, '0')}${darkG.toString(16).padStart(2, '0')}${darkB.toString(16).padStart(2, '0')}`;
+        } 
+        
+        try {
+
+            color = nameToRgba(color);
+            color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`;
+       
+        } catch (error) {
+            console.log("Could not parse color: " + color);
+        }
+        // Handle rgb/rgba colors
+        if (color.startsWith('rgb')) {
+            const match = color.match(/\d+/g);
+            if (match && match.length >= 3) {
+                const r = Math.round(parseInt(match[0]) * brightness);
+                const g = Math.round(parseInt(match[1]) * brightness);
+                const b = Math.round(parseInt(match[2]) * brightness);
+                const a = match[3] ? (parseInt(match[3]) / 255) : 1;
+                
+                return `rgba(${r}, ${g}, ${b}, ${a})`;
+            }
+        }
+        
+        return color;
+    }
+
     static toast(message) {
         Toastify({
             text: message,
@@ -681,6 +759,16 @@ class Unmined {
                         callback: () => this.toggleBinaryGrid()
                     })
             }
+            console.log(this.#options.mapKeyImage);
+            
+            if (this.#options.mapKeyImage) {
+                contextmenu.push(
+                    {
+                        classname: this.#options.showMapKey ? 'menuitem-checked' : 'menuitem-unchecked',
+                        text: 'Show map key',
+                        callback: () => this.toggleMapKey()
+                    })
+            }
             
             contextmenu.push(
                 {
@@ -730,6 +818,12 @@ class Unmined {
         this.saveSettings();
     }
 
+    toggleMapKey() {
+        this.#options.showMapKey = !this.#options.showMapKey;
+        this.updateMapKey();
+        this.saveSettings();
+    }
+
     loadSettings() {
         const mapSettings = (() => {
             try {
@@ -748,6 +842,7 @@ class Unmined {
         this.#options.denseGrid = mapSettings.denseGrid ?? this.#options.denseGrid;
         this.#options.showMarkers = mapSettings.showMarkers ?? this.#options.showMarkers;
         this.#options.showPlayers = mapSettings.showPlayers ?? this.#options.showPlayers;
+        this.#options.showMapKey = mapSettings.showMapKey ?? this.#options.showMapKey;
 
     }
 
@@ -759,6 +854,7 @@ class Unmined {
             denseGrid: this.#options.denseGrid,
             showMarkers: this.#options.showMarkers,
             showPlayers: this.#options.showPlayers,
+            showMapKey: this.#options.showMapKey,
         }
         localStorage.setItem("mapSettings", JSON.stringify(mapSettings))
     }
@@ -769,6 +865,78 @@ class Unmined {
 
     updatePlayerMarkersLayer() {
         this.playerMarkersLayer?.setVisible(this.#options.showPlayers);
+    }
+
+    updateMapKey() {
+        if (!this.#options.mapKeyImage) {
+            if (this.#mapKeyControl) {
+                this.olMap.removeControl(this.#mapKeyControl);
+                this.#mapKeyControl = null;
+            }
+            return;
+        }
+
+        if (!this.#options.showMapKey && this.#mapKeyControl) {
+            this.olMap.removeControl(this.#mapKeyControl);
+            this.#mapKeyControl = null;
+            return;
+        }
+
+        if (this.#options.showMapKey && !this.#mapKeyControl) {
+            this.#mapKeyControl = this.createMapKeyControl();
+            this.olMap.addControl(this.#mapKeyControl);
+        }
+    }
+
+    createMapKeyControl() {
+        const controlElement = document.createElement('div');
+        controlElement.className = 'ol-control ol-unselectable unmined-map-key-control';
+        controlElement.style.position = 'absolute';
+        controlElement.style.bottom = '10px';
+        controlElement.style.right = '10px';
+        controlElement.style.padding = '0';
+        controlElement.style.margin = '0';
+        controlElement.style.background = 'transparent';
+
+        const img = document.createElement('img');
+        img.src = this.#options.mapKeyImage;
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '100%';
+        img.style.display = 'block';
+        img.style.borderRadius = '4px';
+        img.style.boxShadow = '0 1px 5px rgba(0, 0, 0, 0.65)';
+        
+        // Set dynamic scaling constraints
+        // Map key should not exceed 25% of viewport width or 30% of viewport height
+        const maxWidth = Math.min(
+            window.innerWidth * 0.25,
+            window.innerHeight * 0.4
+        );
+        
+        img.style.maxWidth = maxWidth + 'px';
+        img.onload = () => {
+            // Maintain aspect ratio while respecting max dimensions
+            const aspectRatio = img.naturalWidth / img.naturalHeight;
+            let finalWidth = maxWidth;
+            let finalHeight = maxWidth / aspectRatio;
+            
+            if (finalHeight > window.innerHeight * 0.3) {
+                finalHeight = window.innerHeight * 0.3;
+                finalWidth = finalHeight * aspectRatio;
+            }
+            
+            img.style.width = finalWidth + 'px';
+            img.style.height = finalHeight + 'px';
+        };
+
+        controlElement.appendChild(img);
+
+        // Create OpenLayers control
+        const mapKeyControl = new ol.control.Control({
+            element: controlElement
+        });
+
+        return mapKeyControl;
     }
 
     updateScaleBar() {
@@ -818,4 +986,13 @@ class Unmined {
     }
 
 
+}
+
+function nameToRgba(name) {
+    console.log("Parsing color name: " + name);
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    context.fillStyle = name;
+    context.fillRect(0,0,1,1);
+    return context.getImageData(0,0,1,1).data;
 }

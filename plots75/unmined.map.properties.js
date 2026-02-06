@@ -14,5 +14,8 @@ var UnminedMapProperties = {
     enableGrid: true,
     showGrid: true,
     centerX: 0,
-    centerZ: 0
+    centerZ: 0,
+    mapKeyImage: 'mapkey.png',
+
 }
+

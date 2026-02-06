@@ -38,44 +38,130 @@ Use the imageScale property if the pin image is too large.
 
 UnminedCustomMarkers = {
 
-    isEnabled: false,
+    isEnabled: true,
 
     markers: [
-
-        // Example 1: Simple marker
         {
-            x: -200,
-            z: -200,
-            image: "custom.pin.png",
+            x: 500,
+            z: 500,
             imageAnchor: [0.5, 1],
             imageScale: 0.5,
+            text: "Right click / hold to turn markers off",
+            textColor: "white", 
+            offsetX: 0,
+            offsetY: 10,
+            font: "10px Minecraftia, sans-serif",
+        },
+        // Example 1: Simple marker
+        {
+            x: -14,
+            z: 17,
+            image: "../items/minecraft_compass.png",
+            imageAnchor: [0.5, 0.5],
+            imageScale: 0.6,
         },
 
         // Example 2: Marker with text
         {
-            x: 0,
-            z: 0,
-            image: "custom.pin.png",
+            x: -11,
+            z: 77,
+            image: "../items/minecraft_beacon.png",
+            imageAnchor: [0.5, 1],
+            imageScale: 0.6,
+            text: "Shopping Hole",
+            textColor: "DarkTurquoise", 
+            offsetX: 0,
+            offsetY: 10,
+            font: "12px Minecraftia, sans-serif",
+        },
+
+        {
+            x: 55,
+            z: 53,
+            image: "../items/minecraft_honey_bottle.png",
+            imageAnchor: [0.5, 1],
+            imageScale: 0.6,
+            text: "Donut Market",
+            textColor: "DarkTurquoise", 
+            offsetX: 0,
+            offsetY: 10,
+            font: "12px Minecraftia, sans-serif",
+        },
+
+                {
+            x: -92,
+            z: 93,
+            image: "../items/minecraft_tnt.png",
+            imageAnchor: [0.5, 1],
+            imageScale: 0.6,
+            text: "Gamming District",
+            textColor: "white", 
+            offsetX: 0,
+            offsetY: 10,
+            font: "10px Minecraftia, sans-serif",
+        },
+
+        {
+            x: 3,
+            z: -205,
+            image: "../items/minecraft_ender_eye.png",
             imageAnchor: [0.5, 1],
             imageScale: 0.5,
-            text: "Marker with text",
-            textColor: "red", 
+            text: "Stronghold",
+            textColor: "white", 
             offsetX: 0,
-            offsetY: 20,
-            font: "bold 20px Calibri,sans serif",
+            offsetY: 10,
+            font: "10px Minecraftia, sans-serif",
         },
-
+                {
+            x: 5,
+            z: 116,
+            image: "../items/minecraft_campfire.png",
+            imageAnchor: [0.5, 1],
+            imageScale: 0.5,
+            text: "Society",
+            textColor: "SandyBrown", 
+            offsetX: 0,
+            offsetY: 10,
+            font: "12px Minecraftia, sans-serif",
+        },
+                        {
+            x: 142,
+            z: 91,
+            image: "../items/minecraft_rotten_flesh.png",
+            imageAnchor: [0.5, 1],
+            imageScale: 0.5,
+            text: "Humans",
+            textColor: "SandyBrown", 
+            offsetX: 0,
+            offsetY: 10,
+            font: "12px Minecraftia, sans-serif",
+        },
+                                {
+            x: -108,
+            z: 156,
+            image: "../items/minecraft_enchanted_fishing_rod.gif",
+            imageAnchor: [0.5, 1],
+            imageScale: 0.5,
+            text: "Coolsville",
+            textColor: "SandyBrown", 
+            offsetX: 0,
+            offsetY: 10,
+            font: "12px Minecraftia, sans-serif",
+        },
+                                                {
+            x: 59,
+            z: 77,
+            image: "../items/minecraft_cake.png",
+            imageAnchor: [0.5, 1],
+            imageScale: 0.5,
+            text: "Donut",
+            textColor: "SandyBrown", 
+            offsetX: 0,
+            offsetY: 10,
+            font: "12px Minecraftia, sans-serif",
+        },
         // Example 3: Text only
-        {
-            x: 200,
-            z: 200,
-            text: "Text only", 
-            textColor: "yellow", 
-            offsetX: 0,
-            offsetY: 0, 
-            font: "bold 50px Calibri,sans serif",
-        },
-
         // add your markers here
 
 

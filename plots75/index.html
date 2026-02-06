@@ -52,7 +52,11 @@
         }
 
         const mapElement = document.getElementById('map');
-        const unmined = new Unmined(mapElement, UnminedMapProperties, UnminedRegions);
+        const unmined = new Unmined(mapElement, UnminedMapProperties, UnminedRegions, {
+        // ... other options ...
+        mapKeyImage: 'mapkey.png',  // Path to your map key image
+        // ... other options ...
+    });
 
 
     </script>
