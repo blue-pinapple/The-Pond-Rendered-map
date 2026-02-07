@@ -7,15 +7,12 @@ var UnminedMapProperties = {
     minRegionX: -10,
     minRegionZ: -27,
     maxRegionX: 15,
-    maxRegionZ: 2,
+    maxRegionZ: 3,
     worldName: "plots75",
     background: "",
     markers: new Array(),
     enableGrid: true,
     showGrid: true,
     centerX: 0,
-    centerZ: 0,
-    mapKeyImage: 'mapkey.png',
-
+    centerZ: 0
 }
-
